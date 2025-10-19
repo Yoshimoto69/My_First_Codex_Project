@@ -1,0 +1,24 @@
+[
+  {
+    "id": "prov-1",
+    "entity_type": "parcel",
+    "entity_id": "parcel-1",
+    "source_name": "NSW DCDB",
+    "source_url": "https://www.spatial.nsw.gov.au/products_and_services/digital_cadastral_database",
+    "fetched_at": "2023-12-15T05:00:00Z",
+    "license": "CC BY 4.0",
+    "terms": "https://creativecommons.org/licenses/by/4.0/",
+    "refresh_cadence": "monthly"
+  },
+  {
+    "id": "prov-2",
+    "entity_type": "overlay",
+    "entity_id": "parcel-1:flood",
+    "source_name": "NSW Spatial Flood Data",
+    "source_url": "https://portal.spatial.nsw.gov.au/flood",
+    "fetched_at": "2023-12-01T05:00:00Z",
+    "license": "CC BY 4.0",
+    "terms": "https://creativecommons.org/licenses/by/4.0/",
+    "refresh_cadence": "quarterly"
+  }
+]

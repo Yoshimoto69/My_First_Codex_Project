@@ -1,0 +1,26 @@
+[
+  {
+    "id": "parcel-1",
+    "cad_id": "LOT 1 DP123456",
+    "address": "10 Sample St, Marrickville NSW",
+    "state": "NSW",
+    "zoning_code": "R3",
+    "area_sqm": 620.0,
+    "frontage_m": 15.5,
+    "slope_pct": 4.2,
+    "overlays": ["flood", "heritage"],
+    "last_sale_price": 1650000
+  },
+  {
+    "id": "parcel-2",
+    "cad_id": "LOT 22 SP998877",
+    "address": "25 Oak Ave, Coorparoo QLD",
+    "state": "QLD",
+    "zoning_code": "LDR",
+    "area_sqm": 810.0,
+    "frontage_m": 18.0,
+    "slope_pct": 2.5,
+    "overlays": ["bushfire"],
+    "last_sale_price": 1200000
+  }
+]

@@ -1,0 +1,26 @@
+[
+  {
+    "parcel_id": "parcel-1",
+    "overlay_type": "flood",
+    "authority": "NSW SES",
+    "severity": "medium",
+    "source_url": "https://portal.spatial.nsw.gov.au/flood",
+    "captured_at": "2023-12-01T00:00:00Z"
+  },
+  {
+    "parcel_id": "parcel-1",
+    "overlay_type": "heritage",
+    "authority": "Inner West Council",
+    "severity": "listed",
+    "source_url": "https://www.heritage.nsw.gov.au/",
+    "captured_at": "2022-08-15T00:00:00Z"
+  },
+  {
+    "parcel_id": "parcel-2",
+    "overlay_type": "bushfire",
+    "authority": "QLD Fire and Emergency",
+    "severity": "low",
+    "source_url": "https://data.qld.gov.au/dataset/bushfire",
+    "captured_at": "2023-11-10T00:00:00Z"
+  }
+]

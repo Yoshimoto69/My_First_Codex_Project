@@ -1,0 +1,10 @@
+[
+  {
+    "id": "comp-1",
+    "subject_parcel_id": "parcel-1",
+    "comp_parcel_id": "parcel-2",
+    "rationale": "Similar mid-density zoning",
+    "adjustments_json": {"time": -25000, "condition": 15000},
+    "distance_m": 5000
+  }
+]
