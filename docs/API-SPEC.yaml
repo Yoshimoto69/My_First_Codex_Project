@@ -1,0 +1,448 @@
+openapi: 3.0.3
+info:
+  title: DevFindr + PricePro API
+  version: "0.1.0"
+  description: REST API for parcel intelligence, feasibility, CMA, and provenance services.
+servers:
+  - url: https://api.devfindr.local/v1
+    description: Local development
+  - url: https://api.devfindr.com/v1
+    description: Production
+security:
+  - supabaseAuth: []
+tags:
+  - name: Parcels
+  - name: Feaso
+  - name: CMA
+  - name: DevelopmentApplications
+  - name: Provenance
+  - name: Outreach
+paths:
+  /parcels/search:
+    get:
+      tags: [Parcels]
+      summary: Search parcels by spatial and attribute filters.
+      parameters:
+        - in: query
+          name: bbox
+          schema:
+            type: string
+            example: 151.0,-33.9,151.3,-33.7
+          description: Bounding box as minLon,minLat,maxLon,maxLat.
+        - in: query
+          name: zoning
+          schema:
+            type: array
+            items:
+              type: string
+          style: form
+          explode: false
+        - in: query
+          name: min_area
+          schema:
+            type: number
+            format: float
+        - in: query
+          name: max_slope
+          schema:
+            type: number
+            format: float
+        - in: query
+          name: overlay
+          schema:
+            type: string
+            enum: [flood, bushfire, heritage]
+        - in: query
+          name: q
+          schema:
+            type: string
+          description: Search term for address or cad id.
+      responses:
+        '200':
+          description: Paginated parcel results.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ParcelSummary'
+                  next_cursor:
+                    type: string
+        '400':
+          description: Invalid parameters.
+  /parcels/{id}/risk-card:
+    get:
+      tags: [Parcels]
+      summary: Retrieve parcel risk card view data.
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Parcel risk detail.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RiskCard'
+        '404':
+          description: Parcel not found.
+  /feaso/run:
+    post:
+      tags: [Feaso]
+      summary: Execute feasibility analysis for a parcel.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FeasoInput'
+      responses:
+        '200':
+          description: Feaso run result.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FeasoResult'
+        '400':
+          description: Validation error.
+  /cma/compose:
+    post:
+      tags: [CMA]
+      summary: Compose a CMA and queue PDF generation.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CmaComposeRequest'
+      responses:
+        '202':
+          description: CMA enqueued.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  report_id:
+                    type: string
+                  status:
+                    type: string
+                    example: queued
+        '400':
+          description: Validation error.
+  /da/search:
+    get:
+      tags: [DevelopmentApplications]
+      summary: Search development applications by LGA and status.
+      parameters:
+        - in: query
+          name: lga
+          schema:
+            type: string
+        - in: query
+          name: status
+          schema:
+            type: string
+        - in: query
+          name: since
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: DA results.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/DaApplication'
+  /provenance/{entity_type}/{id}:
+    get:
+      tags: [Provenance]
+      summary: Retrieve provenance entries for an entity.
+      parameters:
+        - in: path
+          name: entity_type
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Provenance details.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Provenance'
+  /outreach:
+    post:
+      tags: [Outreach]
+      summary: Log an outreach attempt respecting consent rules.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OutreachRequest'
+      responses:
+        '201':
+          description: Outreach logged.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OutreachResponse'
+        '403':
+          description: Consent not granted.
+components:
+  securitySchemes:
+    supabaseAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    ParcelSummary:
+      type: object
+      properties:
+        id:
+          type: string
+        cad_id:
+          type: string
+        address:
+          type: string
+        state:
+          type: string
+        zoning_code:
+          type: string
+        overlays:
+          type: array
+          items:
+            type: string
+        last_sale_price:
+          type: integer
+          nullable: true
+        provenance_ids:
+          type: array
+          items:
+            type: string
+    RiskCard:
+      type: object
+      properties:
+        parcel:
+          $ref: '#/components/schemas/ParcelSummary'
+        metrics:
+          type: object
+          properties:
+            area_sqm:
+              type: number
+            frontage_m:
+              type: number
+            slope_pct:
+              type: number
+        overlays:
+          type: array
+          items:
+            $ref: '#/components/schemas/OverlayDetail'
+        da_precedents:
+          type: array
+          items:
+            $ref: '#/components/schemas/DaApplication'
+        owner_masked:
+          type: string
+        provenance:
+          type: array
+          items:
+            $ref: '#/components/schemas/Provenance'
+    OverlayDetail:
+      type: object
+      properties:
+        overlay_type:
+          type: string
+        authority:
+          type: string
+        severity:
+          type: string
+          nullable: true
+        source_url:
+          type: string
+        captured_at:
+          type: string
+          format: date-time
+    FeasoInput:
+      type: object
+      required: [parcel_id, build_cost_m2, siteworks_pct, finance_pct, gst_pct, sales_price_m2]
+      properties:
+        parcel_id:
+          type: string
+        build_cost_m2:
+          type: number
+        siteworks_pct:
+          type: number
+        finance_pct:
+          type: number
+        contingency_pct:
+          type: number
+          default: 10
+        gst_pct:
+          type: number
+        sales_price_m2:
+          type: number
+        units_n:
+          type: integer
+          default: 10
+        gross_floor_area_sqm:
+          type: number
+        holding_months:
+          type: integer
+          default: 18
+        interest_rate_pct:
+          type: number
+        pre_sales_pct:
+          type: number
+        equity_contribution_pct:
+          type: number
+    FeasoResult:
+      type: object
+      properties:
+        feaso_run_id:
+          type: string
+        irr_pct:
+          type: number
+        residual:
+          type: number
+        profit_margin_pct:
+          type: number
+        sensitivity:
+          type: array
+          items:
+            type: object
+            properties:
+              metric:
+                type: string
+              delta_pct:
+                type: number
+              irr_pct:
+                type: number
+        provenance:
+          type: array
+          items:
+            $ref: '#/components/schemas/Provenance'
+    CmaComposeRequest:
+      type: object
+      required: [subject_parcel_id, comps]
+      properties:
+        subject_parcel_id:
+          type: string
+        comps:
+          type: array
+          items:
+            type: object
+            properties:
+              parcel_id:
+                type: string
+              adjustments:
+                type: object
+                additionalProperties:
+                  type: number
+        branding_options:
+          type: object
+          properties:
+            logo_url:
+              type: string
+            agent_name:
+              type: string
+        distribution:
+          type: object
+          properties:
+            email:
+              type: string
+            send_copy_to_owner:
+              type: boolean
+    DaApplication:
+      type: object
+      properties:
+        id:
+          type: string
+        lga_code:
+          type: string
+        address:
+          type: string
+        da_ref:
+          type: string
+        proposal:
+          type: string
+        status:
+          type: string
+        received_on:
+          type: string
+          format: date
+        decided_on:
+          type: string
+          format: date
+          nullable: true
+        url:
+          type: string
+        docs_json:
+          type: object
+    Provenance:
+      type: object
+      properties:
+        id:
+          type: string
+        source_name:
+          type: string
+        source_url:
+          type: string
+        fetched_at:
+          type: string
+          format: date-time
+        license:
+          type: string
+        terms:
+          type: string
+        refresh_cadence:
+          type: string
+    OutreachRequest:
+      type: object
+      required: [owner_id, channel]
+      properties:
+        owner_id:
+          type: string
+        channel:
+          type: string
+          enum: [email, phone, mail]
+        template_id:
+          type: string
+        message_preview:
+          type: string
+        consent_token:
+          type: string
+      additionalProperties: false
+    OutreachResponse:
+      type: object
+      properties:
+        outreach_id:
+          type: string
+        status:
+          type: string
+        sent_at:
+          type: string
+          format: date-time

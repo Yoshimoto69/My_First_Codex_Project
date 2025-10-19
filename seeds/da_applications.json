@@ -1,0 +1,15 @@
+[
+  {
+    "id": "da-1",
+    "parcel_id": "parcel-1",
+    "lga_code": "IWC",
+    "address": "10 Sample St, Marrickville NSW",
+    "da_ref": "DA/2023/100",
+    "proposal": "Demolition of existing dwelling and construction of 6 townhouses",
+    "status": "Approved",
+    "received_on": "2023-03-18",
+    "decided_on": "2023-07-22",
+    "url": "https://development.iwc.nsw.gov.au/DA/2023/100",
+    "docs_json": {"statement": "https://development.iwc.nsw.gov.au/docs/da2023-100.pdf"}
+  }
+]

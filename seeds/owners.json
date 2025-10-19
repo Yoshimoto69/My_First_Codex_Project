@@ -1,0 +1,17 @@
+[
+  {
+    "id": "owner-1",
+    "parcel_id": "parcel-1",
+    "owner_masked": "Alex M.",
+    "postal_masked": "PO Box 123, Marrickville NSW",
+    "consent_status": "granted",
+    "last_contacted_at": "2024-01-02T10:00:00Z"
+  },
+  {
+    "id": "owner-2",
+    "parcel_id": "parcel-2",
+    "owner_masked": "Jamie L.",
+    "postal_masked": "Coorparoo QLD",
+    "consent_status": "revoked"
+  }
+]
